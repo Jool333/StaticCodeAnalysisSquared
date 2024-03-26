@@ -365,3 +365,4 @@ FodyWeavers.xsd
 #secrets
 *\secrets.json
 */secrets.json
+src/Scrapers/Secrets/secrets.json
