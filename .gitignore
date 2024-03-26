@@ -363,4 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 
 #secrets
-secrets.json
+src\Scrapers\Secrets\secrets.json
+/src/Scrapers/Secrets/secrets.json
