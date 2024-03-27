@@ -6,7 +6,7 @@ namespace StaticCodeAnalysisSquared.src.FindGoodBad
     {
         public static List<BadEntity> FindBadInDiretory(string filePath)
         {
-            var wholeFile = File.ReadAllText(filePath);
+            var wholeFile = File.ReadLines(filePath);
             int count = 1;
 
             List<BadEntity> badList = [];
@@ -14,7 +14,7 @@ namespace StaticCodeAnalysisSquared.src.FindGoodBad
 
             bool foundEnd = false;
 
-            foreach (var row in wholeFile.Split("\r\n"))
+            foreach (var row in wholeFile)
             {
                 if (filePath.Contains("bad"))
                 {
