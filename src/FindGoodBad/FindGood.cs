@@ -6,13 +6,13 @@ namespace StaticCodeAnalysisSquared.src.FindGoodBad
     {
         public static List<GoodEntity> FindGoodBlocksInFile(string filePath)
         {
-            var wholeFile = File.ReadAllText(filePath);
+            var wholeFile = File.ReadLines(filePath);
             int count = 1;
 
             List<GoodEntity> goodList = [];
             List<int> goodLines = [];
 
-            foreach (var row in wholeFile.Split("\r\n"))
+            foreach (var row in wholeFile)
             {
                 if (filePath.Contains("good"))
                 {
