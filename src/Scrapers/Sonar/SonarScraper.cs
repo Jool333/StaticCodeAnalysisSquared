@@ -93,16 +93,19 @@ namespace Sonar
                                 continue;
                             }
                         }
+                        trueNegative += goodList.Count;
+                        falseNegative += badList.Count;
                         duplicate++;
                         //await Console.Out.WriteLineAsync($"Dupe: {file.Name}\t{line}");
                     }
                 }
                 else
                 {
-                    categoriesData.Where(x => x.Category == file.Category && x.ResultType == "fn").ToList().ForEach(x => x.Counter += badList.Count);
-                    falseNegative += badList.Count;
-                    categoriesData.Where(x => x.Category == file.Category && x.ResultType == "tn").ToList().ForEach(x => x.Counter += goodList.Count);
-                    trueNegative += goodList.Count;
+                    categoriesData.Where(x => x.Category == file.Category && x.ResultType == "fn").ToList().ForEach(x => x.Counter += file.Bad.Count);
+                    categoriesData.Where(x => x.Category == file.Category && x.ResultType == "tn").ToList().ForEach(x => x.Counter += file.Good.Count);
+
+                    trueNegative += file.Good.Count;
+                    falseNegative += file.Bad.Count;
                 }
             }
             double precision = (double)(truePositive)/(double)(truePositive+falsePositive);
@@ -181,9 +184,9 @@ namespace Sonar
             List<Hotspot> uniqueHotspots = fetchedHotspots.GroupBy(h => new { h.Component, h.Line })
                                        .Select(g => g.First())
                                        .ToList();
-            List<Hotspot> NoIPIssue = uniqueHotspots.Where(x => x.Message != "Make sure using this hardcoded IP address '10.10.1.10' is safe here.").ToList();
-            return [.. NoIPIssue.OrderBy(x => x.Component).ThenBy(x => x.Line)];
-            // return [.. uniqueHotspots.OrderBy(x => x.Component).ThenBy(x => x.Line)];
+            // List<Hotspot> NoIPIssue = uniqueHotspots.Where(x => x.Message != "Make sure using this hardcoded IP address '10.10.1.10' is safe here.").ToList();
+            // return [.. NoIPIssue.OrderBy(x => x.Component).ThenBy(x => x.Line)];
+            return [.. uniqueHotspots.OrderBy(x => x.Component).ThenBy(x => x.Line)];
         }
     }
 }
