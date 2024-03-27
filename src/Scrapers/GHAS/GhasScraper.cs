@@ -37,6 +37,12 @@ namespace GHAS
             }
 
             List<GhasEntity> allHotspots = await GetValidHotspots(project);
+            
+            var hotspotCategories = allHotspots.Select(x => x.Path.Split("/")[0] + ": " + x.Rule.Description + ": " + string.Join(", ", x.Rule.Tags)).Distinct().ToList();
+            foreach (var category in hotspotCategories)
+            {
+                await Console.Out.WriteLineAsync(category);
+            }
 
             await Console.Out.WriteLineAsync("Analysing GHAS results");
 

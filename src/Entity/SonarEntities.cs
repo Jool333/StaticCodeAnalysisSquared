@@ -10,6 +10,8 @@
     public class Hotspot
     {
         public required string Component { get; set; }
+        public required string SecurityCategory { get; set; }
+        public required string Message { get; set; } 
         public int Line { get; set; }
     }
 

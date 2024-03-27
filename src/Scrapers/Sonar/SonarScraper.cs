@@ -8,7 +8,8 @@ namespace Sonar
     {
         private static readonly SecretData secrets = SecretData.GetAllData();
         private static readonly string token = secrets.SonarKey;
-        private static readonly JsonSerializerOptions jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        private static readonly JsonSerializerOptions jsonOptions = new() { PropertyNameCaseInsensitive = true };
+
         public static async Task<string> GetSonarResults(List<GoodBadEntity> allGoodBad)
         {
             string resultString = $"SonarQube results are:\n";
@@ -30,7 +31,12 @@ namespace Sonar
 
             List<Hotspot> allHotspots = await GetAllHotspots();
 
-            var allHotspotsPerFile = allHotspots.GroupBy(x => x.Component).ToList();
+            var hotspotCategories = allHotspots.Select(x => x.Component.Split(":")[1].Split("/")[0] + ": " + x.SecurityCategory +": " + x.Message).Distinct().ToList();
+            foreach (var category in hotspotCategories)
+            {
+                await Console.Out.WriteLineAsync(category);
+            }
+
 
             await Console.Out.WriteLineAsync("Analysing SonarQube results");
 
@@ -171,11 +177,13 @@ namespace Sonar
                 await Console.Out.WriteLineAsync($"No data for {project}");
             }
 
+            
             List<Hotspot> uniqueHotspots = fetchedHotspots.GroupBy(h => new { h.Component, h.Line })
                                        .Select(g => g.First())
                                        .ToList();
-
-            return [.. uniqueHotspots.OrderBy(x => x.Component).ThenBy(x => x.Line)];
+            List<Hotspot> NoIPIssue = uniqueHotspots.Where(x => x.Message != "Make sure using this hardcoded IP address '10.10.1.10' is safe here.").ToList();
+            return [.. NoIPIssue.OrderBy(x => x.Component).ThenBy(x => x.Line)];
+            // return [.. uniqueHotspots.OrderBy(x => x.Component).ThenBy(x => x.Line)];
         }
     }
 }

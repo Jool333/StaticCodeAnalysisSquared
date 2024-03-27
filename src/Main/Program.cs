@@ -6,14 +6,17 @@ namespace StaticCodeAnalysisSquared.src.Main
 {
     internal class Program
     {
-        private static readonly string directoryPath = "C:\\Users\\johanols\\Desktop\\TestCaseCollection"; // replace with path to juliet test cases
+        private static readonly string directoryPath = "C:\\Users\\johanols\\Desktop\\"; // replace with path to juliet test cases
+        private static readonly string testCaseFolder = "TestCaseCollection";
+        private static readonly string rulesTxtPath = "SonarRules.txt";
         static async Task Main()
         {
-            // Workflow.MakeWorkflow(directoryPath);
+            // Workflow.MakeWorkflow(Path.Combine(directoryPath,testCaseFolder));
+            // RuleCondenser.Condense(Path.Combine(directoryPath, rulesTxtPath));
 
-            var allGoodBad = FindGoodBadCases.FindInDirectory(directoryPath);
+            var allGoodBad = FindGoodBadCases.FindInDirectory(Path.Combine(directoryPath,testCaseFolder));
             await Console.Out.WriteLineAsync(allGoodBad.Count.ToString());
- 
+
             string sonarResult = await SonarScraper.GetSonarResults(allGoodBad);
             await Console.Out.WriteLineAsync(sonarResult);
 
