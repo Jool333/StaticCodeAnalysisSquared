@@ -97,11 +97,11 @@ namespace GHAS
                                 continue;
                             }
                         }
-                        trueNegative += goodList.Count;
-                        falseNegative += badList.Count;
                         duplicate++;
                         //await Console.Out.WriteLineAsync($"Dupe: {file.Name}\t{line}");
                     }
+                    trueNegative += goodList.Count;
+                    falseNegative += badList.Count;
                 }
                 else
                 {
