@@ -100,6 +100,9 @@ namespace GHAS
                         duplicate++;
                         //await Console.Out.WriteLineAsync($"Dupe: {file.Name}\t{line}");
                     }
+                    categoriesData.Where(x => x.Category == file.Category && x.ResultType == "fn").ToList().ForEach(x => x.Counter += badList.Count);
+                    categoriesData.Where(x => x.Category == file.Category && x.ResultType == "tn").ToList().ForEach(x => x.Counter += goodList.Count);
+
                     trueNegative += goodList.Count;
                     falseNegative += badList.Count;
                 }
