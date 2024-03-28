@@ -26,23 +26,11 @@ namespace GHAS
             int trueNegative = 0;
             int duplicate = 0;
 
-            List<string> allCategories = allGoodBad.Select(x => x.Category).Distinct().ToList();
-            List<CategoryResults> categoriesData = [];
-            foreach (var category in allCategories)
-            {
-                categoriesData.Add(new CategoryResults(category, "tp", 0));
-                categoriesData.Add(new CategoryResults(category, "fp", 0));
-                categoriesData.Add(new CategoryResults(category, "tn", 0));
-                categoriesData.Add(new CategoryResults(category, "fn", 0));
-            }
+            List<CategoryResults> categoriesData = CreateCategoryResultList(allGoodBad);
 
             List<GhasEntity> allHotspots = await GetValidHotspots(project);
-            
-            var hotspotCategories = allHotspots.Select(x => x.Path.Split("/")[0] + ": " + x.Rule.Description + ": " + string.Join(", ", x.Rule.Tags)).Distinct().ToList();
-            foreach (var category in hotspotCategories)
-            {
-                await Console.Out.WriteLineAsync(category);
-            }
+
+            PrintHotspotCategories(allHotspots);
 
             await Console.Out.WriteLineAsync("Analysing GHAS results");
 
@@ -142,7 +130,7 @@ namespace GHAS
         /// </summary>
         /// <param name="project"></param>
         /// <returns></returns>
-        public static async Task<List<GhasEntity>> GetValidHotspots(string project)
+        private static async Task<List<GhasEntity>> GetValidHotspots(string project)
         {
             List<GhasEntity> allHotspots = await ScrapeGhasAsync(project);
             List<GhasEntity> validHotspots = allHotspots.Where(x => x.Path.Contains("CWE")).ToList();
@@ -157,7 +145,7 @@ namespace GHAS
         /// </summary>
         /// <param name="project"></param>
         /// <returns></returns>
-        public static async Task<List<GhasEntity>> ScrapeGhasAsync(string project)
+        private static async Task<List<GhasEntity>> ScrapeGhasAsync(string project)
         {
             string? owner = (project == "TestCasesCurated" ? secrets.GithubOwner1 : secrets.GithubOwner2)
                             ?? throw new ArgumentNullException("owner 2 not specified");
@@ -203,6 +191,12 @@ namespace GHAS
                                        .Select(g => g.First())
                                        .ToList();
 
+            List<string> filterList = new(); // { "Make sure using this hardcoded IP address '10.10.1.10' is safe here.", };
+            if (filterList.Count > 0)
+            {
+                uniqueHotspots = FilterHotspots(uniqueHotspots, filterList);
+            }
+
             return [.. uniqueHotspots.OrderBy(x => x.Path).ThenBy(x => x.Line)];
         }
 
@@ -226,6 +220,42 @@ namespace GHAS
             }
 
             return alertCount;
+        }
+
+        private static List<CategoryResults> CreateCategoryResultList(List<GoodBadEntity> goodBad)
+        {
+            List<string> allCategories = goodBad.Select(x => x.Category).Distinct().ToList();
+            List<CategoryResults> categoriesData = [];
+
+            foreach (var category in allCategories)
+            {
+                categoriesData.Add(new CategoryResults(category, "tp", 0));
+                categoriesData.Add(new CategoryResults(category, "fp", 0));
+                categoriesData.Add(new CategoryResults(category, "tn", 0));
+                categoriesData.Add(new CategoryResults(category, "fn", 0));
+            }
+
+            return categoriesData;
+        }
+
+        private static void PrintHotspotCategories(List<GhasEntity> hotspots)
+        {
+            var hotspotCategories = hotspots.Select(x => x.Path.Split("/")[0] + ": " + x.Rule.Description + ": " + string.Join(", ", x.Rule.Tags)).Distinct().ToList();
+            foreach (var category in hotspotCategories)
+            {
+                Console.WriteLine(category);
+            }
+        }
+
+        private static List<GhasEntity> FilterHotspots(List<GhasEntity> unfilteredHotspots, List<string> filterList)
+        {
+            List<GhasEntity> filteredHotspots = [];
+
+            foreach (var issue in filterList)
+            {
+                filteredHotspots = unfilteredHotspots.Where(x => x.Rule.Description != issue).ToList();
+            }
+            return [.. filteredHotspots.OrderBy(x => x.Path).ThenBy(x => x.Line)];
         }
     }
 }

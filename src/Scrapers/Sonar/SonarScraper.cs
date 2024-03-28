@@ -19,24 +19,11 @@ namespace Sonar
             int trueNegative = 0;
             int duplicate = 0;
 
-            List<string> allCategories = allGoodBad.Select(x => x.Category).Distinct().ToList();
-            List<CategoryResults> categoriesData = [];
-            foreach (var category in allCategories)
-            {
-                categoriesData.Add(new CategoryResults(category, "tp", 0));
-                categoriesData.Add(new CategoryResults(category, "fp", 0));
-                categoriesData.Add(new CategoryResults(category, "tn", 0));
-                categoriesData.Add(new CategoryResults(category, "fn", 0));
-            }
+            List<CategoryResults> categoriesData = CreateCategoryResultList(allGoodBad);
 
             List<Hotspot> allHotspots = await GetAllHotspots();
 
-            var hotspotCategories = allHotspots.Select(x => x.Component.Split(":")[1].Split("/")[0] + ": " + x.SecurityCategory +": " + x.Message).Distinct().ToList();
-            foreach (var category in hotspotCategories)
-            {
-                await Console.Out.WriteLineAsync(category);
-            }
-
+            PrintHotspotCategories(allHotspots);
 
             await Console.Out.WriteLineAsync("Analysing SonarQube results");
 
@@ -111,6 +98,7 @@ namespace Sonar
                     falseNegative += file.Bad.Count;
                 }
             }
+
             double precision = (double)(truePositive)/(double)(truePositive+falsePositive);
             double recall = (double)(truePositive)/ (double)(truePositive+falseNegative);
             double fScore = (2*precision*recall)/(precision+recall);
@@ -119,6 +107,7 @@ namespace Sonar
             double tn = trueNegative;
             double fn = falseNegative;
             double mcc = (tp * tn - fp * fn) / Math.Sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn));
+
             resultString += 
                 $"True Positives:  {truePositive}\n" +
                 $"False Positive:  {falsePositive}\n" +
@@ -146,6 +135,7 @@ namespace Sonar
 
             HttpClient client = new();
             client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
+            client.BaseAddress = new Uri("http://localhost:9000/api/hotspots/search?");
 
             int page = 1;
             bool valid = true;
@@ -154,7 +144,7 @@ namespace Sonar
 
             do
             {
-                var response = await client.GetAsync($"http://localhost:9000/api/hotspots/search?inNewCodePeriod=false&onlyMine=false&p={page}&project={project}&ps=500&status=TO_REVIEW");
+                var response = await client.GetAsync($"inNewCodePeriod=false&onlyMine=false&p={page}&project={project}&ps=500&status=TO_REVIEW");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -187,9 +177,52 @@ namespace Sonar
             List<Hotspot> uniqueHotspots = fetchedHotspots.GroupBy(h => new { h.Component, h.Line })
                                        .Select(g => g.First())
                                        .ToList();
-            // List<Hotspot> NoIPIssue = uniqueHotspots.Where(x => x.Message != "Make sure using this hardcoded IP address '10.10.1.10' is safe here.").ToList();
-            // return [.. NoIPIssue.OrderBy(x => x.Component).ThenBy(x => x.Line)];
+
+            List<string> filterList = new(); // { "Make sure using this hardcoded IP address '10.10.1.10' is safe here.", };
+            if (filterList.Count > 0)
+            {
+               uniqueHotspots = FilterHotspots(uniqueHotspots, filterList);
+            }
+
             return [.. uniqueHotspots.OrderBy(x => x.Component).ThenBy(x => x.Line)];
+        }
+
+        private static List<CategoryResults> CreateCategoryResultList(List<GoodBadEntity> goodBad)
+        {
+            List<string> allCategories = goodBad.Select(x => x.Category).Distinct().ToList();
+            List<CategoryResults> categoriesData = [];
+
+            foreach (var category in allCategories)
+            {
+                categoriesData.Add(new CategoryResults(category, "tp", 0));
+                categoriesData.Add(new CategoryResults(category, "fp", 0));
+                categoriesData.Add(new CategoryResults(category, "tn", 0));
+                categoriesData.Add(new CategoryResults(category, "fn", 0));
+            }
+
+            return categoriesData;
+        }
+
+        private static void PrintHotspotCategories(List<Hotspot> hotspots)
+        {
+            Console.WriteLine("All found categories in hotspots:");
+            List<string> hotspotCategories = hotspots.Select(x => x.Component.Split(":")[1].Split("/")[0] + ": " + x.SecurityCategory + ": " + x.Message).Distinct().ToList();
+
+            foreach (var category in hotspotCategories)
+            {
+                Console.WriteLine(category);
+            }
+        }
+
+        private static List<Hotspot> FilterHotspots(List<Hotspot> unfilteredHotspots, List<string> filterList)
+        {
+            List<Hotspot> filteredHotspots = [];
+
+            foreach (var issue in filterList)
+            {
+                filteredHotspots = unfilteredHotspots.Where(x => x.Message != issue).ToList();
+            }
+            return [.. filteredHotspots.OrderBy(x => x.Component).ThenBy(x => x.Line)];
         }
     }
 }

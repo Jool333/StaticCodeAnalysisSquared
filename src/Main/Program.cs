@@ -8,7 +8,7 @@ namespace StaticCodeAnalysisSquared.src.Main
     {
         private static readonly string directoryPath = "C:\\Users\\johanols\\Desktop\\"; // replace with path to juliet test cases
         private static readonly string testCaseFolder = "TestCaseCollection";
-        private static readonly string rulesTxtPath = "SonarRules.txt";
+        // private static readonly string rulesTxtPath = "SonarRules.txt";
         static async Task Main()
         {
             // Workflow.MakeWorkflow(Path.Combine(directoryPath,testCaseFolder));
@@ -24,7 +24,6 @@ namespace StaticCodeAnalysisSquared.src.Main
             await Console.Out.WriteLineAsync(ghasResult);
 
             string snyk = "SnykScan";
-
             string snykResult = await GhasScraper.GetGhasResults(allGoodBad, snyk);
             await Console.Out.WriteLineAsync(snykResult);
 
