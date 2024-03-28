@@ -366,3 +366,4 @@ FodyWeavers.xsd
 *\secrets.json
 */secrets.json
 src/Scrapers/Secrets/secrets.json
+/src/Scrapers/Secrets/secrets.json

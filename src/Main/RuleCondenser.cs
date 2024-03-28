@@ -4,7 +4,7 @@
     {
         public static void Condense(string filePath)
         {
-            List<string> wholeFile = File.ReadLines(filePath).ToList();
+            List<string> wholeFile = File.ReadLines(filePath).Select(x=>x.Split(" ")[0]).ToList();
 
             wholeFile.Sort();
 
