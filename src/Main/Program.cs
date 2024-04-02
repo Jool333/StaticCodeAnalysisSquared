@@ -1,5 +1,6 @@
 ﻿using GHAS;
 using Sonar;
+using StaticCodeAnalysisSquared.src.Entity;
 using StaticCodeAnalysisSquared.src.FindGoodBad;
 
 namespace StaticCodeAnalysisSquared.src.Main
@@ -8,16 +9,18 @@ namespace StaticCodeAnalysisSquared.src.Main
     {
         private static readonly string directoryPath = "C:\\Users\\johanols\\Desktop\\"; // replace with path to juliet test cases and any rules txts
         private static readonly string testCaseFolder = "TestCaseCollection"; // replace with the folder containing the individual testcases
-        private static readonly List<string> rulesTxtPaths = [/*"SonarRules.txt", "GHASRules.txt"*/]; 
+        private static readonly List<string> rulesTxtPaths = ["SemgrepRules.txt"/*, "SonarRules.txt", "GHASRules.txt"*/]; 
         static async Task Main()
         {
             List<Option> options = [
-                new(1, "Make workflow",false,true),
+                new(1, "Make workflow",false,false),
                 new(2, "Condense rules",false,false),
                 new(3, "Scan with SonarQube",false,false),
                 new(4, "Scan with Github Advanced Security",false,false),
-                new(5, "Scan with Snyk",true,false),
+                new(5, "Scan with Snyk",false,false),
                 new(6, "Scan with SemGrep",false,false)];
+
+            options[0].IsCurrentlySelected = true;
 
             PrintMenu(options);
 
@@ -49,15 +52,28 @@ namespace StaticCodeAnalysisSquared.src.Main
                 }
                 if (keyInfo.Key == ConsoleKey.Enter)
                 {
+                    if(keyInfo.Modifiers == ConsoleModifiers.Shift)
+                    {
+                        options.ForEach(x => x.IsSelected = true);
+                    }
                     start = true;
                 }
                 PrintMenu(options);
 
             } while(!start);
 
+            ClearConsole();
+
             string testcasePath = Path.Combine(directoryPath, testCaseFolder);
-            var allGoodBad = FindGoodBadCases.FindInDirectory(testcasePath);
-            await Console.Out.WriteLineAsync(allGoodBad.Count.ToString());
+            List<GoodBadEntity> allGoodBad = [];
+
+            // only load goodbad if performing relevant task
+            if (options.Where(x=> x.Id>2).Select(x => x.IsSelected).Any(x => x == true))
+            {
+                allGoodBad = FindGoodBadCases.FindInDirectory(testcasePath);
+                await Console.Out.WriteLineAsync(allGoodBad.Count.ToString());
+            }
+            
 
             foreach (var option in options.Where(x => x.IsSelected == true))
             {
@@ -104,7 +120,7 @@ namespace StaticCodeAnalysisSquared.src.Main
         {
             ClearConsole();
             Console.WriteLine(
-                "Static Code Analysis Squared started\n" +
+                "Static Code Analysis Squared started!\n" +
                 "Select processes to run, press space to select and enter to run.");
             foreach (var option in options)
             {
@@ -120,15 +136,16 @@ namespace StaticCodeAnalysisSquared.src.Main
                 {
                     Console.Write("\t [ ]\t");
                 }
-                Console.Write(option.Message+"\n");
+                Console.Write(option.Message + "\n");
                 Console.ForegroundColor = ConsoleColor.White;
             }
         }
+
         public static void ClearConsole()
         {
             Console.SetCursorPosition(0, 0);
             Console.CursorVisible = false;
-            for (int y = 0; y < Console.WindowHeight; y++)
+            for (int i = 0; i < Console.WindowHeight; i++)
                 Console.Write(new String(' ', Console.WindowWidth));
             Console.SetCursorPosition(0, 0);
             Console.CursorVisible = true;

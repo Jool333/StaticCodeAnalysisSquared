@@ -131,7 +131,7 @@ namespace Sonar
         {
             HttpClient client = new();
             client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
-            client.BaseAddress = new Uri("http://localhost:9000/api/hotspots/search?");
+            client.BaseAddress = new Uri("http://localhost:9000/api/");
 
             int page = 1;
             bool valid = true;
@@ -140,7 +140,7 @@ namespace Sonar
 
             do
             {
-                var response = await client.GetAsync($"inNewCodePeriod=false&onlyMine=false&p={page}&project={project}&ps=500&status=TO_REVIEW");
+                var response = await client.GetAsync($"hotspots/search?inNewCodePeriod=false&onlyMine=false&p={page}&project={project}&ps=500&status=TO_REVIEW");
 
                 if (response.IsSuccessStatusCode)
                 {
