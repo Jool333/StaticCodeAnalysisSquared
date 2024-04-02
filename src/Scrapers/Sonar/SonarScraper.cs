@@ -25,7 +25,7 @@ namespace Sonar
 
             PrintHotspotCategories(allHotspots);
 
-            await Console.Out.WriteLineAsync("Analysing SonarQube results");
+            await Console.Out.WriteLineAsync("Analysing SonarQube results...\n");
 
             foreach (var file in allGoodBad)
             {
@@ -109,7 +109,7 @@ namespace Sonar
             double mcc = (tp * tn - fp * fn) / Math.Sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn));
 
             resultString +=
-                $"True Positives:  {truePositive}\n" +
+                $"\nTrue Positives:  {truePositive}\n" +
                 $"False Positive:  {falsePositive}\n" +
                 $"False Negative: {falseNegative}\n" +
                 $"True Negative: {trueNegative}\n" +
@@ -123,7 +123,7 @@ namespace Sonar
         {
             List<Hotspot> allHotspots = await ScrapeSonarAsync();
             List<Hotspot> validHotspots = allHotspots.Where(x => x.Component.Contains("CWE")).ToList();
-            await Console.Out.WriteLineAsync(validHotspots.Count.ToString());
+            await Console.Out.WriteLineAsync($"Valid security hotspots: {validHotspots.Count}\n");
             return validHotspots;
         }
 
@@ -144,7 +144,8 @@ namespace Sonar
 
                 if (response.IsSuccessStatusCode)
                 {
-                    await Console.Out.WriteLineAsync($"Loading SonarQube data page: {page}");
+                    await Console.Out.WriteAsync($"\rLoading SonarQube data page: {page}");
+
                     var json = response.Content.ReadAsStringAsync().Result;
 
                     var roots = JsonSerializer.Deserialize<Root>(json, jsonOptions);
@@ -163,21 +164,13 @@ namespace Sonar
 
             } while (valid);
 
-            if (fetchedHotspots.Count > 0)
-            {
-                await Console.Out.WriteLineAsync($"SonarQube data loaded for {project}");
-            }
-            else
-            {
-                await Console.Out.WriteLineAsync($"No data for {project}");
-            }
+            await Console.Out.WriteLineAsync("\nAll pages loaded\n");
 
-            
             List<Hotspot> uniqueHotspots = fetchedHotspots.GroupBy(h => new { h.Component, h.Line })
                                        .Select(g => g.First())
                                        .ToList();
 
-            List<string> filterList = []; // new(){ "Make sure using this hardcoded IP address '10.10.1.10' is safe here.", };
+            List<string> filterList = ["Make sure using this hardcoded IP address '10.10.1.10' is safe here.",];
             if (filterList.Count > 0)
             {
                uniqueHotspots = FilterHotspots(uniqueHotspots, filterList);
@@ -219,9 +212,9 @@ namespace Sonar
 
             foreach (var issue in filterList)
             {
-                filteredHotspots = unfilteredHotspots.Where(x => x.Message != issue).ToList();
+                filteredHotspots.AddRange(unfilteredHotspots.Where(x => x.Message != issue).ToList());
             }
-            return [.. filteredHotspots.OrderBy(x => x.Component).ThenBy(x => x.Line)];
+            return [.. filteredHotspots.Distinct().OrderBy(x => x.Component).ThenBy(x => x.Line)];
         }
     }
 }

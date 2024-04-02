@@ -32,7 +32,7 @@ namespace GHAS
 
             PrintHotspotCategories(allHotspots);
 
-            await Console.Out.WriteLineAsync("Analysing GHAS results");
+            await Console.Out.WriteLineAsync("Analysing GHAS results... \n");
 
             foreach (var file in allGoodBad)
             {
@@ -113,7 +113,7 @@ namespace GHAS
             double mcc = (tp * tn - fp * fn)/Math.Sqrt( (tp + fp)*(tp + fn)*(tn+fp)*(tn+fn));
 
             resultString += 
-                $"True Positives:  {truePositive}\n" +
+                $"\nTrue Positives:  {truePositive}\n" +
                 $"False Positive:  {falsePositive}\n" +
                 $"False Negative: {falseNegative}\n" +
                 $"True Negative: {trueNegative}\n" +
@@ -134,7 +134,7 @@ namespace GHAS
             List<GhasEntity> allHotspots = await ScrapeGhasAsync(project);
             List<GhasEntity> validHotspots = allHotspots.Where(x => x.Path.Contains("CWE")).ToList();
 
-            await Console.Out.WriteLineAsync($"Valid security hotspots: {validHotspots.Count}");
+            await Console.Out.WriteLineAsync($"Valid security hotspots: {validHotspots.Count}\n");
 
             return validHotspots;
         }
@@ -168,7 +168,7 @@ namespace GHAS
             do
             {
                 var response = await client.GetAsync($"repos/{owner}/{project}/code-scanning/alerts?page={page}&per_page={itemsPerPage}");
-                await Console.Out.WriteLineAsync($"Loading GHAS data page: {page}");
+                await Console.Out.WriteAsync($"\rLoading GHAS data page: {page}");
                 if (response.IsSuccessStatusCode)
                 {
                     var json = response.Content.ReadAsStringAsync().Result;
@@ -188,12 +188,13 @@ namespace GHAS
 
             } while (valid);
 
+            await Console.Out.WriteLineAsync("\nAll pages loaded\n");
             var convertedHotspots = GhasEntity.Convert(fetchedHotspots);
             var uniqueHotspots = convertedHotspots.GroupBy(h => new { h.Path, h.Line })
                                        .Select(g => g.First())
                                        .ToList();
 
-            List<string> filterList = []; // new(){ "Make sure using this hardcoded IP address '10.10.1.10' is safe here.", }; // example of unvanted message
+            List<string> filterList = ["insecure-deserialization",];  // example of unvanted message
             if (filterList.Count > 0)
             {
                 uniqueHotspots = FilterHotspots(uniqueHotspots, filterList);
@@ -259,9 +260,10 @@ namespace GHAS
 
             foreach (var issue in filterList)
             {
-                filteredHotspots = unfilteredHotspots.Where(x => x.Rule.Description != issue).ToList();
+                var filtered = unfilteredHotspots.Where(x => !x.Rule.Description.Contains(issue)).ToList();
+                filteredHotspots.AddRange(filtered);
             }
-            return [.. filteredHotspots.OrderBy(x => x.Path).ThenBy(x => x.Line)];
+            return [.. filteredHotspots.Distinct().OrderBy(x => x.Path).ThenBy(x => x.Line)];
         }
     }
 }
