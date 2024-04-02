@@ -26,7 +26,7 @@
     public class Rules
     {
         public required string Description { get; set; }
-        public string[]? Tags { get; set; }
+        public string[] Tags { get; set; } = ["No tags"];
     }
     public class GhasEntity(string path, int line, Rules rule)
     {

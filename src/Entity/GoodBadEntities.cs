@@ -4,8 +4,8 @@
     {
         public required string Category { get; set; }
         public required string Name { get; set; }
-        public List<BadEntity>? Bad { get; set; }
-        public List<GoodEntity>? Good { get; set; }
+        public List<BadEntity> Bad { get; set; } = [];
+        public List<GoodEntity> Good { get; set; } = [];
     }
     public class GoodEntity
     {

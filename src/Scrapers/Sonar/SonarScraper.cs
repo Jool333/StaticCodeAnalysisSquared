@@ -108,15 +108,14 @@ namespace Sonar
             double fn = falseNegative;
             double mcc = (tp * tn - fp * fn) / Math.Sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn));
 
-            resultString += 
+            resultString +=
                 $"True Positives:  {truePositive}\n" +
                 $"False Positive:  {falsePositive}\n" +
                 $"False Negative: {falseNegative}\n" +
                 $"True Negative: {trueNegative}\n" +
-                $"dupe/miss: {duplicate}\n" +
-                $"{truePositive + falseNegative}\n" +
-                $"precision: {precision}, recall: {recall} " +
-                $"f-score: {fScore} MCC: {mcc}\n";
+                $"Duplicates: {duplicate}\n" +
+                $"Precision: {precision}, Recall: {recall} " +
+                $"F-score: {fScore} MCC: {mcc}\n";
 
             return resultString;
         }
@@ -130,9 +129,6 @@ namespace Sonar
 
         private static async Task<List<Hotspot>> ScrapeSonarAsync(string project = "SelectedTests")
         {
-            SecretData secrets = SecretData.GetAllData();
-            string token = secrets.SonarKey;
-
             HttpClient client = new();
             client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
             client.BaseAddress = new Uri("http://localhost:9000/api/hotspots/search?");
@@ -152,9 +148,12 @@ namespace Sonar
                     var json = response.Content.ReadAsStringAsync().Result;
 
                     var roots = JsonSerializer.Deserialize<Root>(json, jsonOptions);
-                    fetchedHotspots.AddRange(collection: roots?.Hotspots);
-                    
-                    valid = roots.Paging.Total / roots.Paging.PageSize >= roots.Paging.PageIndex;
+                    if(roots != null && roots.Hotspots != null)
+                    {
+                        fetchedHotspots.AddRange(collection: roots.Hotspots);
+                        valid = roots.Paging.Total / roots.Paging.PageSize >= roots.Paging.PageIndex;
+                    }
+
                     page++;
                 }
                 else
@@ -178,7 +177,7 @@ namespace Sonar
                                        .Select(g => g.First())
                                        .ToList();
 
-            List<string> filterList = new(); // { "Make sure using this hardcoded IP address '10.10.1.10' is safe here.", };
+            List<string> filterList = []; // new(){ "Make sure using this hardcoded IP address '10.10.1.10' is safe here.", };
             if (filterList.Count > 0)
             {
                uniqueHotspots = FilterHotspots(uniqueHotspots, filterList);

@@ -117,10 +117,9 @@ namespace GHAS
                 $"False Positive:  {falsePositive}\n" +
                 $"False Negative: {falseNegative}\n" +
                 $"True Negative: {trueNegative}\n" +
-                $"dupe/miss: {duplicate}\n" +
-                $"{truePositive + falseNegative}\n" +
-                $"precision: {precision}, recall: {recall} " +
-                $"f-score: {fScore} MCC: {mcc}\n";
+                $"Duplicates: {duplicate}\n" +
+                $"Precision: {precision}, Recall: {recall} " +
+                $"F-score: {fScore} MCC: {mcc}\n";
 
             return resultString;
         }
@@ -147,8 +146,8 @@ namespace GHAS
         /// <returns></returns>
         private static async Task<List<GhasEntity>> ScrapeGhasAsync(string project)
         {
-            string? owner = (project == "TestCasesCurated" ? secrets.GithubOwner1 : secrets.GithubOwner2)
-                            ?? throw new ArgumentNullException("owner 2 not specified");
+            string? owner = project == "TestCasesCurated" ? secrets.GithubOwner1 : secrets.GithubOwner2 ?? throw new ArgumentNullException($"{secrets.GithubOwner2}","owner 2 not specified")
+                            ;
 
             List<RootObject> fetchedHotspots = [];
             int page = 1;
@@ -175,7 +174,10 @@ namespace GHAS
                     var json = response.Content.ReadAsStringAsync().Result;
 
                     var alertResults = JsonSerializer.Deserialize<List<RootObject>>(json, jsonSerializerOptions);
-                    fetchedHotspots.AddRange(collection: alertResults);
+                    if (alertResults != null)
+                    {
+                        fetchedHotspots.AddRange(collection: alertResults);
+                    }
                     valid = nbrOfAlerts / itemsPerPage >= page;
                     page++;
                 }
@@ -191,7 +193,7 @@ namespace GHAS
                                        .Select(g => g.First())
                                        .ToList();
 
-            List<string> filterList = new(); // { "Make sure using this hardcoded IP address '10.10.1.10' is safe here.", };
+            List<string> filterList = []; // new(){ "Make sure using this hardcoded IP address '10.10.1.10' is safe here.", }; // example of unvanted message
             if (filterList.Count > 0)
             {
                 uniqueHotspots = FilterHotspots(uniqueHotspots, filterList);
@@ -216,7 +218,11 @@ namespace GHAS
             {
                 string jsonString = alertNbrResponse.Content.ReadAsStringAsync().Result;
                 var data = JsonSerializer.Deserialize<List<RootObject>>(jsonString, jsonSerializerOptions);
-                alertCount = data[0].Number;
+
+                if (data != null)
+                {
+                    alertCount = data[0].Number;
+                }
             }
 
             return alertCount;

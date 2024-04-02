@@ -48,7 +48,9 @@ namespace StaticCodeAnalysisSquared.src.FindGoodBad
             List<GoodEntity> goodList = FindGood.FindGoodBlocksInFile(filePath);
             allGoodCount += goodList.Count;
 
-            string returnString = string.Empty;
+            goodBadList.Add(new GoodBadEntity() { Category = category, Name = croppedFilePath, Bad = badList, Good = goodList });
+
+            string returnString;
 
             if ( goodList.Count != 0 && badList.Count != 0 )
             {
@@ -67,7 +69,7 @@ namespace StaticCodeAnalysisSquared.src.FindGoodBad
             
 
             //testcases\CWE80_XSS\s02\CWE80_XSS__Web_QueryString_Web_01.cs
-            goodBadList.Add(new GoodBadEntity() { Category = category, Name = croppedFilePath, Bad = badList, Good = goodList });
+            
             return returnString;
         }
 
