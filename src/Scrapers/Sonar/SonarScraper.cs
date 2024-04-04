@@ -25,7 +25,7 @@ namespace Sonar
 
             PrintHotspotCategories(allHotspots);
 
-            await Console.Out.WriteLineAsync("Analysing SonarQube results...\n");
+            await Console.Out.WriteLineAsync("\nAnalysing SonarQube results...\n");
 
             foreach (var file in allGoodBad)
             {

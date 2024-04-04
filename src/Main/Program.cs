@@ -41,6 +41,7 @@ namespace StaticCodeAnalysisSquared.src.Main
         private static void PrintMenu()
         {
             ClearConsole();
+            
             Console.WriteLine(
                 "Static Code Analysis^2 started!\n" +
                 "Select processes to run, press space to select and enter to run. Shift+Enter to run all, Ctrl+Shift+Enter to run all scanners");
@@ -137,28 +138,34 @@ namespace StaticCodeAnalysisSquared.src.Main
                 switch (option.Id)
                 {
                     case 1:
+                        PrintLine();
                         Workflow.MakeWorkflow(testcasePath);
                         break;
                     case 2:
+                        PrintLine();
                         foreach (var ruleTxt in rulesTxtPaths)
                         {
                             RuleCondenser.Condense(Path.Combine(directoryPath, ruleTxt));
                         }
                         break;
                     case 3:
+                        PrintLine();
                         string sonarResult = await SonarScraper.GetSonarResults(allGoodBad);
                         await Console.Out.WriteLineAsync(sonarResult);
                         break;
                     case 4:
+                        PrintLine();
                         string ghasResult = await GhasScraper.GetGhasResults(allGoodBad);
                         await Console.Out.WriteLineAsync(ghasResult);
                         break;
                     case 5:
+                        PrintLine();
                         string snyk = "SnykScan";
                         string snykResult = await GhasScraper.GetGhasResults(allGoodBad, snyk);
                         await Console.Out.WriteLineAsync(snykResult);
                         break;
                     case 6:
+                        PrintLine();
                         string sem1 = "SemgrepScan1";
                         string sem1Result = await GhasScraper.GetGhasResults(allGoodBad, sem1);
                         await Console.Out.WriteLineAsync(sem1Result);
@@ -171,8 +178,7 @@ namespace StaticCodeAnalysisSquared.src.Main
                         break;
                 }
             }
-            
-
+            PrintLine();
         }
         private static bool Again()
         {
@@ -208,6 +214,14 @@ namespace StaticCodeAnalysisSquared.src.Main
                 option.IsSelected = false;
                 option.IsCurrentlySelected = false;
             }
+        }
+        private static void PrintLine()
+        {
+            for (int i = 0; i < Console.WindowWidth; i++)
+            {
+                Console.Write("─");
+            }
+            Console.Write("\n");
         }
     }
     public class Option(int id, string message, bool isSelected, bool isCurrentlySelected)

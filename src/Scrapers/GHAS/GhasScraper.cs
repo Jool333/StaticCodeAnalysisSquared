@@ -32,7 +32,7 @@ namespace GHAS
 
             PrintHotspotCategories(allHotspots);
 
-            await Console.Out.WriteLineAsync("Analysing GHAS results... \n");
+            await Console.Out.WriteLineAsync("\nAnalysing GHAS results... \n");
 
             foreach (var file in allGoodBad)
             {
