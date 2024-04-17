@@ -181,23 +181,23 @@ namespace StaticCodeAnalysisSquared.src.Main
                         break;
                     case 4:
                         PrintLine();
-                        string ghasResult = await GhasScraper.GetGhasResults(allGoodBad);
+                        string ghasResult = await GHApiScraper.GetGhasResults(allGoodBad);
                         await Console.Out.WriteLineAsync(ghasResult);
                         break;
                     case 5:
                         PrintLine();
                         string snyk = "SnykScan";
-                        string snykResult = await GhasScraper.GetGhasResults(allGoodBad, snyk);
+                        string snykResult = await GHApiScraper.GetGhasResults(allGoodBad, snyk);
                         await Console.Out.WriteLineAsync(snykResult);
                         break;
                     case 6:
                         PrintLine();
                         string sem1 = "SemgrepScan1";
-                        string sem1Result = await GhasScraper.GetGhasResults(allGoodBad, sem1);
+                        string sem1Result = await GHApiScraper.GetGhasResults(allGoodBad, sem1);
                         await Console.Out.WriteLineAsync(sem1Result);
 
                         string sem2 = "SemgrepScan2";
-                        string sem2Result = await GhasScraper.GetGhasResults(allGoodBad, sem2);
+                        string sem2Result = await GHApiScraper.GetGhasResults(allGoodBad, sem2);
                         await Console.Out.WriteLineAsync(sem2Result);
                         break;
                     case 0:
