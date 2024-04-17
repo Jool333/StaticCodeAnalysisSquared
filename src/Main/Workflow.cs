@@ -47,7 +47,7 @@
                 // Get the file name with extension
                 string fileName = Path.GetFileName(filePath);
                 string fileNameNoExtension = fileName.Split(".")[0];
-                string projectFolderPath = string.Join(@"\", filePath.Split('\\').Skip(8).Take(2));
+                string projectFolderPath = string.Join(@"\", filePath.Split('\\').Skip(7).Take(2)); 
 
                 string template = $"\n\n" +
                                   $"    - name: Build {fileNameNoExtension}\r\n" +

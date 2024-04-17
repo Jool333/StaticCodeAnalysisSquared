@@ -5,7 +5,7 @@ using StaticCodeAnalysisSquared.src.Scrapers.Secrets;
 
 namespace GHAS
 {
-    public class GhasScraper
+    public class GHApiScraper
     {
         private static readonly SecretData secrets = SecretData.GetAllData();
         private static readonly string token = secrets.GithubToken;
@@ -19,7 +19,8 @@ namespace GHAS
         /// <returns></returns>
         public static async Task<string> GetGhasResults(List<GoodBadEntity> allGoodBad, string project = "TestCasesCurated")
         {
-            string resultString = $"GHAS results are:\n";
+            string tool = project == "TestCasesCurated" ? "GHAS" : project == "SnykScan" ? "Snyk" : "Semgrep";
+            string resultString = $"{tool} results are:\n";
             int truePositive = 0;
             int falsePositive = 0;
             int falseNegative = 0;
@@ -32,7 +33,7 @@ namespace GHAS
 
             PrintHotspotCategories(allHotspots);
 
-            await Console.Out.WriteLineAsync("\nAnalysing GHAS results... \n");
+            await Console.Out.WriteLineAsync($"\nAnalysing {tool} results... \n");
 
             foreach (var file in allGoodBad)
             {
@@ -164,11 +165,11 @@ namespace GHAS
             int nbrOfAlerts = await GetAlertAmountAsync(client, owner, project);
             await Console.Out.WriteLineAsync($"Amount of security alerts found: {nbrOfAlerts}");
 
-            await Console.Out.WriteLineAsync($"Loading GHAS data");
+            await Console.Out.WriteLineAsync($"Loading GHApi data");
             do
             {
                 var response = await client.GetAsync($"repos/{owner}/{project}/code-scanning/alerts?page={page}&per_page={itemsPerPage}");
-                await Console.Out.WriteAsync($"\rLoading GHAS data page: {page}");
+                await Console.Out.WriteAsync($"\rLoading GHApi data page: {page}");
                 if (response.IsSuccessStatusCode)
                 {
                     var json = response.Content.ReadAsStringAsync().Result;
