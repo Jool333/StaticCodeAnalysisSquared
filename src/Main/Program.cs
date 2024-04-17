@@ -1,14 +1,20 @@
-﻿using GHAS;
+﻿using System.Reflection;
+using GHAS;
 using Sonar;
 using StaticCodeAnalysisSquared.src.Entity;
 using StaticCodeAnalysisSquared.src.FindGoodBad;
 
 namespace StaticCodeAnalysisSquared.src.Main
 {
+    /// <summary>
+    /// The main program class, runs the menu and calls all other runable classes.
+    /// </summary>
     internal class Program
     {
-        private static readonly string directoryPath = "C:\\Users\\johanols\\Desktop\\"; // replace with path to juliet test cases and any rules txts
-        private static readonly string testCaseFolder = "TestCaseCollection"; // replace with the folder containing the individual testcases
+        private static readonly string projectRoot = Directory.GetParent(Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location))?.Parent?.Parent?.FullName;
+        private static readonly string testCaseFolder = @"src/testcases";
+        private static readonly string rulesFolder = Path.Combine(projectRoot, @"src/rules");
+
         private static readonly List<string> rulesTxtPaths = ["SemgrepRules.txt"/*, "SonarRules.txt", "GHASRules.txt"*/]; 
         private static readonly List<Option> options = [new(1, "Make workflow",false,false),
                                                         new(2, "Condense rules",false,false),
@@ -16,6 +22,11 @@ namespace StaticCodeAnalysisSquared.src.Main
                                                         new(4, "Scan with Github Advanced Security",false,false),
                                                         new(5, "Scan with Snyk",false,false),
                                                         new(6, "Scan with SemGrep",false,false)];
+        /// <summary>
+        /// Starts the program, starts by reseting the optionslist, then starts the menu, the executes if there are any options selected.
+        /// Once all options are executed it the ask if you want to go again and will start over if you do.
+        /// </summary>
+        /// <returns></returns>
         static async Task Main()
         {
             bool again;
@@ -23,13 +34,7 @@ namespace StaticCodeAnalysisSquared.src.Main
             {
                 Reset();
 
-                options[0].IsCurrentlySelected = true;
-
-                PrintMenu();
-
                 OperateMenu();
-
-                ClearConsole();
 
                 await ExcecuteChoice();
 
@@ -38,13 +43,18 @@ namespace StaticCodeAnalysisSquared.src.Main
             } while (again);
             
         }
+        /// <summary>
+        /// Prints the menu based on the <see cref="options"/> list, starts by clearing the console.
+        /// A currently selected option is made green while the rest iw white.
+        /// </summary>
         private static void PrintMenu()
         {
             ClearConsole();
             
             Console.WriteLine(
                 "Static Code Analysis^2 started!\n" +
-                "Select processes to run, press space to select and enter to run. Shift+Enter to run all, Ctrl+Shift+Enter to run all scanners");
+                "Select processes to run:\nPress space to select and enter to run.\nShift+Enter to run all processes.\n" +
+                "Ctrl+Shift+Enter to run all scanners.\nPress Esc to exit the program.");
             foreach (var option in options)
             {
                 if (option.IsCurrentlySelected)
@@ -64,6 +74,9 @@ namespace StaticCodeAnalysisSquared.src.Main
             }
         }
 
+        /// <summary>
+        /// A console clearing method that overwrites the existing text, produces much less flashing compared to <see cref="Console.Clear"/>.
+        /// </summary>
         public static void ClearConsole()
         {
             Console.SetCursorPosition(0, 0);
@@ -73,6 +86,9 @@ namespace StaticCodeAnalysisSquared.src.Main
             Console.SetCursorPosition(0, 0);
             Console.CursorVisible = true;
         }
+        /// <summary>
+        /// Reads key input and updated the options accordingly, then either prints the menu, starts the processes or exits the program. 
+        /// </summary>
         private static void OperateMenu()
         {
             bool start = false;
@@ -80,6 +96,8 @@ namespace StaticCodeAnalysisSquared.src.Main
             ConsoleKeyInfo keyInfo;
             do
             {
+                Console.CursorVisible = false;
+                PrintMenu();
                 keyInfo = Console.ReadKey();
 
                 if (keyInfo.Key == ConsoleKey.DownArrow && index + 1 < options.Count)
@@ -87,19 +105,16 @@ namespace StaticCodeAnalysisSquared.src.Main
                     options.Where(x => x.IsCurrentlySelected = true).ToList().ForEach(x => x.IsCurrentlySelected = false);
                     index++;
                     options[index].IsCurrentlySelected = true;
-                    PrintMenu();
                 }
                 if (keyInfo.Key == ConsoleKey.UpArrow && index - 1 >= 0)
                 {
                     options.Where(x => x.IsCurrentlySelected = true).ToList().ForEach(x => x.IsCurrentlySelected = false);
                     index--;
                     options[index].IsCurrentlySelected = true;
-                    PrintMenu();
                 }
                 if (keyInfo.Key == ConsoleKey.Spacebar)
                 {
                     options[index].IsSelected = !options[index].IsSelected;
-                    PrintMenu();
                 }
                 if (keyInfo.Key == ConsoleKey.Enter)
                 {
@@ -116,13 +131,24 @@ namespace StaticCodeAnalysisSquared.src.Main
                         start = true;
                     }
                 }
+                if (keyInfo.Key == ConsoleKey.Escape)
+                {
+                    Exit();
+                }
                 PrintMenu();
 
             } while (!start);
+
+            ClearConsole();
         }
+        /// <summary>
+        /// Runs the processes depending on the selected options, only loads goodbad data if it performing a sca tool process.
+        /// Each process is divided by a screen wide line.
+        /// </summary>
+        /// <returns></returns>
         private static async Task ExcecuteChoice()
         {
-            string testcasePath = Path.Combine(directoryPath, testCaseFolder);
+            string testcasePath = Path.Combine(projectRoot, testCaseFolder);
             List<GoodBadEntity> allGoodBad = [];
 
             // only load goodbad if performing relevant task
@@ -145,7 +171,7 @@ namespace StaticCodeAnalysisSquared.src.Main
                         PrintLine();
                         foreach (var ruleTxt in rulesTxtPaths)
                         {
-                            RuleCondenser.Condense(Path.Combine(directoryPath, ruleTxt));
+                            RuleCondenser.Condense(Path.Combine(Path.Combine(projectRoot, rulesFolder), ruleTxt));
                         }
                         break;
                     case 3:
@@ -180,8 +206,13 @@ namespace StaticCodeAnalysisSquared.src.Main
             }
             PrintLine();
         }
+        /// <summary>
+        /// Sees if the user wants to run the program again, only accepts y/Y or n/N as input.
+        /// if y it restarts, n it exits.
+        /// </summary>
         private static bool Again()
         {
+            Console.CursorVisible = true;
             Console.Write("\nDo you want to run more tests? y/n:\t");
             ConsoleKeyInfo readKey;
             bool again = false;
@@ -206,7 +237,38 @@ namespace StaticCodeAnalysisSquared.src.Main
             
             return again;
         }
+        /// <summary>
+        /// Sees if the user wants to exit the program, only accepts y/Y or n/N as input.
+        /// if n it continues where it was, y it exits.
+        /// </summary>
+        private static void Exit()
+        {
+            Console.CursorVisible = true;
+            Console.Write("\nAre you sure you want to exit? y/n:\t");
+            ConsoleKeyInfo readKey;
+            bool valid = false;
+            do
+            {
+                readKey = Console.ReadKey();
+                if (readKey.Key == ConsoleKey.N || readKey.Key == ConsoleKey.Y)
+                {
+                    valid = true;
+                    if (readKey.Key == ConsoleKey.Y)
+                    {
+                        Environment.Exit(0);
+                    }
+                }
+                else
+                {
+                    Console.Write("\b \b");
+                }
 
+            } while (!valid);
+        }
+
+        /// <summary>
+        /// Resets the options list to its initial form.
+        /// </summary>
         private static void Reset()
         {
             foreach (var option in options)
@@ -214,7 +276,12 @@ namespace StaticCodeAnalysisSquared.src.Main
                 option.IsSelected = false;
                 option.IsCurrentlySelected = false;
             }
+
+            options[0].IsCurrentlySelected = true;
         }
+        /// <summary>
+        /// prints a window wide line.
+        /// </summary>
         private static void PrintLine()
         {
             for (int i = 0; i < Console.WindowWidth; i++)
@@ -224,6 +291,14 @@ namespace StaticCodeAnalysisSquared.src.Main
             Console.Write("\n");
         }
     }
+
+    /// <summary>
+    /// Class for each menu option and its parameters
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="message"></param>
+    /// <param name="isSelected"></param>
+    /// <param name="isCurrentlySelected"></param>
     public class Option(int id, string message, bool isSelected, bool isCurrentlySelected)
     {
         public int Id { get; set; } = id;

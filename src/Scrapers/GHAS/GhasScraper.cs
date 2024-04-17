@@ -28,7 +28,7 @@ namespace GHAS
 
             List<CategoryResults> categoriesData = CreateCategoryResultList(allGoodBad);
 
-            List<GhasEntity> allHotspots = await GetValidHotspots(project);
+            List<GithubEntity> allHotspots = await GetValidHotspots(project);
 
             PrintHotspotCategories(allHotspots);
 
@@ -129,10 +129,10 @@ namespace GHAS
         /// </summary>
         /// <param name="project"></param>
         /// <returns></returns>
-        private static async Task<List<GhasEntity>> GetValidHotspots(string project)
+        private static async Task<List<GithubEntity>> GetValidHotspots(string project)
         {
-            List<GhasEntity> allHotspots = await ScrapeGhasAsync(project);
-            List<GhasEntity> validHotspots = allHotspots.Where(x => x.Path.Contains("CWE")).ToList();
+            List<GithubEntity> allHotspots = await ScrapeGhasAsync(project);
+            List<GithubEntity> validHotspots = allHotspots.Where(x => x.Path.Contains("CWE")).ToList();
 
             await Console.Out.WriteLineAsync($"Valid security hotspots: {validHotspots.Count}\n");
 
@@ -144,7 +144,7 @@ namespace GHAS
         /// </summary>
         /// <param name="project"></param>
         /// <returns></returns>
-        private static async Task<List<GhasEntity>> ScrapeGhasAsync(string project)
+        private static async Task<List<GithubEntity>> ScrapeGhasAsync(string project)
         {
             string? owner = project == "TestCasesCurated" ? secrets.GithubOwner1 : secrets.GithubOwner2 ?? throw new ArgumentNullException($"{secrets.GithubOwner2}","owner 2 not specified")
                             ;
@@ -189,7 +189,7 @@ namespace GHAS
             } while (valid);
 
             await Console.Out.WriteLineAsync("\nAll pages loaded\n");
-            var convertedHotspots = GhasEntity.Convert(fetchedHotspots);
+            var convertedHotspots = GithubEntity.Convert(fetchedHotspots);
             var uniqueHotspots = convertedHotspots.GroupBy(h => new { h.Path, h.Line })
                                        .Select(g => g.First())
                                        .ToList();
@@ -245,7 +245,7 @@ namespace GHAS
             return categoriesData;
         }
 
-        private static void PrintHotspotCategories(List<GhasEntity> hotspots)
+        private static void PrintHotspotCategories(List<GithubEntity> hotspots)
         {
             var hotspotCategories = hotspots.Select(x => x.Path.Split("/")[0] + ": " + x.Rule.Description + ": " + string.Join(", ", x.Rule.Tags)).Distinct().ToList();
             foreach (var category in hotspotCategories)
@@ -254,9 +254,9 @@ namespace GHAS
             }
         }
 
-        private static List<GhasEntity> FilterHotspots(List<GhasEntity> unfilteredHotspots, List<string> filterList)
+        private static List<GithubEntity> FilterHotspots(List<GithubEntity> unfilteredHotspots, List<string> filterList)
         {
-            List<GhasEntity> filteredHotspots = [];
+            List<GithubEntity> filteredHotspots = [];
 
             foreach (var issue in filterList)
             {

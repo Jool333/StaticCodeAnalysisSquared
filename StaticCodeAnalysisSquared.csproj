@@ -9,8 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="src\rules\**" />
     <Compile Remove="src\testcases\**" />
+    <EmbeddedResource Remove="src\rules\**" />
     <EmbeddedResource Remove="src\testcases\**" />
+    <None Remove="src\rules\**" />
     <None Remove="src\testcases\**" />
   </ItemGroup>
 

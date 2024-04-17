@@ -1,0 +1,12 @@
+﻿C:\Users\johanols\Downloads\2020-08-01-juliet-test-suite-for-csharp-v1-3\src\TestCaseSupport\TestCaseSupport\AbstractTestCaseBase.cs
+C:\Users\johanols\Downloads\2020-08-01-juliet-test-suite-for-csharp-v1-3\src\TestCaseSupport\TestCaseSupport\AbstractTestCase.cs
+C:\Users\johanols\Downloads\2020-08-01-juliet-test-suite-for-csharp-v1-3\src\TestCaseSupport\TestCaseSupport\AbstractTestCaseBadOnly.cs
+C:\Users\johanols\Downloads\2020-08-01-juliet-test-suite-for-csharp-v1-3\src\TestCaseSupport\TestCaseSupport\AbstractTestCaseClassIssueGood.cs
+C:\Users\johanols\Downloads\2020-08-01-juliet-test-suite-for-csharp-v1-3\src\TestCaseSupport\TestCaseSupport\AbstractTestCaseClassIssueBad.cs
+C:\Users\johanols\Downloads\2020-08-01-juliet-test-suite-for-csharp-v1-3\src\TestCaseSupport\TestCaseSupport\AbstractTestCaseClassIssue.cs
+C:\Users\johanols\Downloads\2020-08-01-juliet-test-suite-for-csharp-v1-3\src\TestCaseSupport\TestCaseSupport\AbstractTestCaseWeb.cs
+C:\Users\johanols\Downloads\2020-08-01-juliet-test-suite-for-csharp-v1-3\src\TestCaseSupport\TestCaseSupport\AbstractTestCaseWebBadOnly.cs
+C:\Users\johanols\Downloads\2020-08-01-juliet-test-suite-for-csharp-v1-3\src\TestCaseSupport\TestCaseSupport\AbstractTestCaseWebBase.cs
+C:\Users\johanols\Downloads\2020-08-01-juliet-test-suite-for-csharp-v1-3\src\TestCaseSupport\TestCaseSupport\IO.cs
+C:\Users\johanols\Downloads\2020-08-01-juliet-test-suite-for-csharp-v1-3\src\TestCaseSupport\TestCaseSupport\Properties\AssemblyInfo.cs
+C:\Users\johanols\Downloads\2020-08-01-juliet-test-suite-for-csharp-v1-3\src\TestCaseSupport\TestCaseSupport\packages.config
