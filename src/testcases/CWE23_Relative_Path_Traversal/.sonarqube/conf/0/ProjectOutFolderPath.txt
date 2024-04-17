@@ -1,0 +1,1 @@
+C:\Users\johanols\Desktop\TestCaseCollection\testcases\CWE23_Relative_Path_Traversal\.sonarqube\out\0

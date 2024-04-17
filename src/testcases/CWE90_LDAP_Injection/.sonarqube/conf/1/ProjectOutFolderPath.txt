@@ -1,0 +1,1 @@
+C:\Users\johanols\Desktop\TestCaseCollection\testcases\CWE90_LDAP_Injection\.sonarqube\out\1

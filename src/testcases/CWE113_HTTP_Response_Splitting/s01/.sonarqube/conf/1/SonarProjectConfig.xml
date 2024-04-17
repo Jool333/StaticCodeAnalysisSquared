@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SonarProjectConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.sonarsource.com/msbuild/analyzer/2021/1">
+  <AnalysisConfigPath>C:\Users\johanols\Downloads\2020-08-01-juliet-test-suite-for-csharp-v1-3\src\testcases\CWE113_HTTP_Response_Splitting\s01\.sonarqube\conf\SonarQubeAnalysisConfig.xml</AnalysisConfigPath>
+  <ProjectPath>C:\Users\johanols\Downloads\2020-08-01-juliet-test-suite-for-csharp-v1-3\src\testcases\CWE113_HTTP_Response_Splitting\s01\CWE113_HTTP_Response_Splitting_s01.csproj</ProjectPath>
+  <FilesToAnalyzePath>C:\Users\johanols\Downloads\2020-08-01-juliet-test-suite-for-csharp-v1-3\src\testcases\CWE113_HTTP_Response_Splitting\s01\.sonarqube\conf\1\FilesToAnalyze.txt</FilesToAnalyzePath>
+  <OutPath>C:\Users\johanols\Downloads\2020-08-01-juliet-test-suite-for-csharp-v1-3\src\testcases\CWE113_HTTP_Response_Splitting\s01\.sonarqube\out\1</OutPath>
+  <ProjectType>Product</ProjectType>
+</SonarProjectConfig>

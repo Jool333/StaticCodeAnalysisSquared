@@ -1,0 +1,12 @@
+﻿C:\Users\johanols\Desktop\TestCaseCollection\TestCaseSupport\TestCaseSupport\AbstractTestCaseBase.cs
+C:\Users\johanols\Desktop\TestCaseCollection\TestCaseSupport\TestCaseSupport\AbstractTestCase.cs
+C:\Users\johanols\Desktop\TestCaseCollection\TestCaseSupport\TestCaseSupport\AbstractTestCaseBadOnly.cs
+C:\Users\johanols\Desktop\TestCaseCollection\TestCaseSupport\TestCaseSupport\AbstractTestCaseClassIssueGood.cs
+C:\Users\johanols\Desktop\TestCaseCollection\TestCaseSupport\TestCaseSupport\AbstractTestCaseClassIssueBad.cs
+C:\Users\johanols\Desktop\TestCaseCollection\TestCaseSupport\TestCaseSupport\AbstractTestCaseClassIssue.cs
+C:\Users\johanols\Desktop\TestCaseCollection\TestCaseSupport\TestCaseSupport\AbstractTestCaseWeb.cs
+C:\Users\johanols\Desktop\TestCaseCollection\TestCaseSupport\TestCaseSupport\AbstractTestCaseWebBadOnly.cs
+C:\Users\johanols\Desktop\TestCaseCollection\TestCaseSupport\TestCaseSupport\AbstractTestCaseWebBase.cs
+C:\Users\johanols\Desktop\TestCaseCollection\TestCaseSupport\TestCaseSupport\IO.cs
+C:\Users\johanols\Desktop\TestCaseCollection\TestCaseSupport\TestCaseSupport\Properties\AssemblyInfo.cs
+C:\Users\johanols\Desktop\TestCaseCollection\TestCaseSupport\TestCaseSupport\packages.config

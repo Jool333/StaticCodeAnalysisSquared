@@ -2,9 +2,16 @@
 
 namespace StaticCodeAnalysisSquared.src.FindGoodBad
 {
+    /// <summary>
+    /// Class for finding all bad entities.
+    /// </summary>
     internal class FindBad
     {
-        public static List<BadEntity> FindBadInDiretory(string filePath)
+        /// <summary>
+        /// Finds all bad entities in a given <paramref name="filePath"/> and returns them in a list.
+        /// </summary>
+        /// <param name="filePath"></param>
+        public static List<BadEntity> FindBadInFile(string filePath)
         {
             var wholeFile = File.ReadLines(filePath);
             int count = 1;

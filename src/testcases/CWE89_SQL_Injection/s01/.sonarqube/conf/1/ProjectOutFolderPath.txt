@@ -1,0 +1,1 @@
+C:\Users\johanols\Downloads\2020-08-01-juliet-test-suite-for-csharp-v1-3\src\testcases\CWE89_SQL_Injection\s01\.sonarqube\out\1
