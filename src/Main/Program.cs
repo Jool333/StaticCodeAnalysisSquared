@@ -11,6 +11,7 @@ namespace StaticCodeAnalysisSquared.src.Main
     /// </summary>
     internal class Program
     {
+        //Gets the project root directory.
         private static readonly string projectRoot = Directory.GetParent(Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location))?.Parent?.Parent?.FullName;
         private static readonly string testCaseFolder = @"src/testcases";
         private static readonly string rulesFolder = Path.Combine(projectRoot, @"src/rules");
